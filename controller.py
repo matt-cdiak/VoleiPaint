@@ -5,7 +5,8 @@ class Controller:
         self.view.canvas.bind("<Button-1>", self.start_draw)
         self.view.canvas.bind("<B1-Motion>", self.draw)
         self.view.canvas.bind("<ButtonRelease-1>", self.stop_draw)
-        self.view.toggle_eraser = self.toggle_eraser
+        self.view.eraser_button.config(command=self.toggle_eraser)
+        self.view.pencil_button.config(command=self.toggle_pencil)
 
     def start_draw(self, event):
         self.model.drawing_data["draw"] = True
@@ -14,12 +15,20 @@ class Controller:
 
     def draw(self, event):
         if self.model.drawing_data["draw"]:
-            self.view.canvas.create_line(self.model.drawing_data["x"], self.model.drawing_data["y"], event.x, event.y, fill=self.model.drawing_data["color"], width=5, smooth=True)
+
+            if self.model.drawing_data["color"] == self.view.canvas.cget("bg"):
+                self.view.canvas.create_line(self.model.drawing_data["x"], self.model.drawing_data["y"], event.x, event.y, fill=self.model.drawing_data["color"], width=50, smooth=True)
+            else:
+                self.view.canvas.create_line(self.model.drawing_data["x"], self.model.drawing_data["y"], event.x, event.y, fill=self.model.drawing_data["color"], width=5, smooth=True)
+
             self.model.drawing_data["x"] = event.x
             self.model.drawing_data["y"] = event.y
-
+    
     def stop_draw(self, event):
         self.model.drawing_data["draw"] = False
 
     def toggle_eraser(self):
-        self.model.drawing_data["color"] = "white" if self.model.drawing_data["color"] == "black" else "white"
+        self.model.drawing_data["color"] = self.view.canvas.cget("bg")
+
+    def toggle_pencil(self):
+        self.model.drawing_data["color"] = "black"
